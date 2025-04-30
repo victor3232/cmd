@@ -44,3 +44,15 @@ sudo rm /var/cache/apt/archives/lock
 ```
 sudo dpkg --configure -a
 ```
+# WARP IPV4 / IPV6 CLOUDFLARE
+```
+rm -rf warp.sh && wget https://raw.githubusercontent.com/P3TERX/warp.sh/main/warp.sh && bash warp.sh wgd
+```
+# WARP IPV4 ONLY
+```
+rm -rf warp.sh && wget https://raw.githubusercontent.com/P3TERX/warp.sh/main/warp.sh && bash warp.sh wg4
+```
+# OFF WARP 
+```
+rm -rf warp.sh && wget https://raw.githubusercontent.com/P3TERX/warp.sh/main/warp.sh && bash warp.sh dwg
+```
