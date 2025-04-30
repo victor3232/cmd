@@ -1,5 +1,8 @@
+# SCRIPT AUTO INSTALLER VPN
+```
+wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/main/premi.sh && chmod +x premi.sh && ./premi.sh
+```
 # CRON JOB
-
 ```
 0 0 * * * /sbin/shutdown -r now
 ```
