@@ -12,6 +12,9 @@ wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/mai
 ```
 1 12 * * * php /var/www/pterodactyl/artisan cache:clear >> /dev/null 2>&1
 ```
+```
+1 4 * * * cd /var/www/pterodactyl && php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear >> /dev/null 2>&1
+```
 # OPEN & CLOSE PORT
 
 ```
