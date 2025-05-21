@@ -2,6 +2,10 @@
 ```
 wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/main/premi.sh && chmod +x premi.sh && ./premi.sh
 ```
+# AUTO ROOT VPS
+````
+sudo apt install wget curl -y && wget https://raw.githubusercontent.com/willstore69/access/main/easy-root.sh && chmod +x easy-root.sh && ./easy-root.sh && rm -rf easy-root.sh
+````
 # CRON JOB
 ```
 0 0 * * * /sbin/shutdown -r now
