@@ -11,6 +11,9 @@ sudo apt install wget curl -y && wget https://raw.githubusercontent.com/willstor
 0 0 * * * /sbin/shutdown -r now
 ```
 ```
+0 */12 * * * /sbin/shutdown -r now
+```
+```
 0 */8 * * * /sbin/shutdown -r now
 ```
 ```
