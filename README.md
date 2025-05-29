@@ -8,7 +8,7 @@ sudo apt install wget curl -y && wget https://raw.githubusercontent.com/willstor
 ````
 # ELYSIUM
 ```
-https://raw.githubusercontent.com/LeXcZxMoDz9/kontol/refs/heads/main/bangke.sh
+bash <(curl -s https://raw.githubusercontent.com/LeXcZxMoDz9/kontol/refs/heads/main/bangke.sh)
 ```
 # CRON JOB
 ```
