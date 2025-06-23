@@ -5,6 +5,7 @@ wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/mai
 ```
 # SECURITY PTERODACTYL
 ````
+```
 public function delete(Request $request, Server $server): RedirectResponse
 {
     // Hanya admin utama yang diizinkan
