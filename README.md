@@ -2,6 +2,28 @@
 ```
 wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/main/premi.sh && chmod +x premi.sh && ./premi.sh
 ```
+```
+# SECURITY PTERODACTYL
+````
+public function delete(Request $request, Server $server): RedirectResponse
+{
+    // Hanya admin utama yang diizinkan
+    $allowedAdmins = [1]; // Ganti ID sesuai admin utama kamu
+
+    if (!in_array($request->user()->id, $allowedAdmins)) {
+        return redirect()->route('admin.servers.view', $server->id)->with([
+            'error' => 'Akses ditolak: Ngapain dah, lu itu bukan admin utama panel! (Anti rusuh by hits ssh Official)'
+        ]);
+    }
+
+    // Jika lolos validasi admin, lanjutkan hapus server
+    $this->deletionService->withForce($request->filled('force_delete'))->handle($server);
+    $this->alert->success(trans('admin.server.alerts.server_deleted'))->flash();
+
+    return redirect()->route('admin.servers');
+}
+````
+
 # AUTO ROOT VPS
 ````
 sudo apt install wget curl -y && wget https://raw.githubusercontent.com/willstore69/access/main/easy-root.sh && chmod +x easy-root.sh && ./easy-root.sh && rm -rf easy-root.sh
