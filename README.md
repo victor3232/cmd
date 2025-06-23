@@ -82,6 +82,13 @@ sudo rm /var/cache/apt/archives/lock
 ```
 sudo dpkg --configure -a
 ```
+```
+kill( angka muncul )
+```
+```
+dpkg --configure -a
+```
+
 # WARP IPV4 / IPV6 CLOUDFLARE
 ```
 rm -rf warp.sh && wget https://raw.githubusercontent.com/P3TERX/warp.sh/main/warp.sh && bash warp.sh wgd
