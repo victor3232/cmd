@@ -4,12 +4,13 @@ wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/mai
 ```
 # IPV4
 ```
-iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT
-iptables -A INPUT -p udp -j DROP
+iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT && iptables -A INPUT -p udp -j DROP
 ```
 ```
-iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT
-iptables -A INPUT -p udp -j DROP
+iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT && iptables -A INPUT -p udp -j DROP
+```
+```
+iptables-save > /etc/iptables.rules
 ```
 ```
 apt install fail2ban
