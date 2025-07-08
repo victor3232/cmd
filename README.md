@@ -19,6 +19,9 @@ apt install fail2ban
 systemctl start fail2ban
 ```
 ```
+nano /etc/fail2ban/jail.local
+```
+```
 [DEFAULT]
 # Umum
 bantime = 3600
