@@ -2,6 +2,109 @@
 ```
 wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/main/premi.sh && chmod +x premi.sh && ./premi.sh
 ```
+```
+# JAIL.CONF
+```
+```
+#!/bin/bash
+# ==========================================
+# AUTO INSTALL & KONFIGURASI ANTI DDOS L4 + L7
+# by ChatGPT (Optimized)
+# ==========================================
+
+echo "[1/6] Update & Install paket yang dibutuhkan..."
+apt update -y
+apt install fail2ban nginx -y
+
+echo "[2/6] Backup konfigurasi lama (jika ada)..."
+cp /etc/fail2ban/jail.local /etc/fail2ban/jail.local.bak-$(date +%F-%H%M) 2>/dev/null || true
+cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak-$(date +%F-%H%M)
+
+echo "[3/6] Buat konfigurasi Fail2ban (L4 & L7)..."
+cat > /etc/fail2ban/jail.local <<'EOL'
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+backend = auto
+destemail = root@localhost
+action = %(action_)s
+logtarget = /var/log/fail2ban.log
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+bantime = 3600
+findtime = 600
+
+[nginx-http-auth]
+enabled = true
+filter = nginx-http-auth
+port = http,https
+logpath = /var/log/nginx/*access*.log
+maxretry = 10
+bantime = 3600
+findtime = 600
+
+[nginx-botsearch]
+enabled = true
+filter = nginx-botsearch
+port = http,https
+logpath = /var/log/nginx/*access*.log
+maxretry = 10
+bantime = 3600
+findtime = 600
+
+[nginx-http-flood]
+enabled = true
+port = http,https
+filter = nginx-http-flood
+logpath = /var/log/nginx/*access*.log
+maxretry = 200
+findtime = 60
+bantime = 3600
+
+[recidive]
+enabled = true
+logpath = /var/log/fail2ban.log
+bantime = 86400
+findtime = 86400
+maxretry = 5
+EOL
+
+echo "[4/6] Buat filter HTTP Flood..."
+cat > /etc/fail2ban/filter.d/nginx-http-flood.conf <<'EOL'
+[Definition]
+failregex = ^<HOST> -.*"(GET|POST).*HTTP.*" 200
+ignoreregex =
+EOL
+
+echo "[5/6] Tambah Rate Limiting di NGINX..."
+# Tambah rate limiting di nginx.conf jika belum ada
+if ! grep -q "limit_req_zone" /etc/nginx/nginx.conf; then
+sed -i '/http {/a \    limit_req_zone $binary_remote_addr zone=req_limit_per_ip:10m rate=10r/s;\n    limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip:10m;' /etc/nginx/nginx.conf
+fi
+
+echo "[6/6] Restarting services..."
+systemctl restart fail2ban
+nginx -t && systemctl reload nginx
+
+echo "==========================================="
+echo "✅ Anti-DDoS L4 + L7 berhasil diinstal!"
+echo "Cek status jail: sudo fail2ban-client status"
+echo "==========================================="
+```
+```
+chmod +x namafile.sh
+```
+```
+sudo bash namafile.sh
+```
+```
+
 # IPV4
 ```
 iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT && iptables -A INPUT -p udp -j DROP
