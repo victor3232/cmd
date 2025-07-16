@@ -103,8 +103,7 @@ chmod +x namafile.sh
 ```
 sudo bash namafile.sh
 ```
-```
-
+``'
 # IPV4
 ```
 iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT && iptables -A INPUT -p udp -j DROP
