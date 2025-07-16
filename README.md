@@ -1,27 +1,27 @@
-# SCRIPT AUTO INSTALLER VPN
-```
-wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/main/premi.sh && chmod +x premi.sh && ./premi.sh
-```
-```
-# JAIL.CONF
-```
+# Jail new
 ```
 #!/bin/bash
 # ==========================================
-# AUTO INSTALL & KONFIGURASI ANTI DDOS L4 + L7
-# by ChatGPT (Optimized)
+# AUTO INSTALL & KONFIGURASI ANTI DDOS FULL (L4 + L7)
+# + NOTIFIKASI TELEGRAM
 # ==========================================
 
-echo "[1/6] Update & Install paket yang dibutuhkan..."
-apt update -y
-apt install fail2ban nginx -y
+### === EDIT BAGIAN INI SESUAI KEBUTUHAN ===
+TELEGRAM_BOT_TOKEN="ISI_TOKEN_BOTMU"
+TELEGRAM_CHAT_ID="ISI_CHAT_ID_MU" # bisa group atau private ID
+### =======================================
 
-echo "[2/6] Backup konfigurasi lama (jika ada)..."
+echo "[1/9] Update & Install paket..."
+apt update -y
+apt install fail2ban nginx iptables-persistent curl -y
+
+echo "[2/9] Backup konfigurasi lama..."
 cp /etc/fail2ban/jail.local /etc/fail2ban/jail.local.bak-$(date +%F-%H%M) 2>/dev/null || true
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak-$(date +%F-%H%M)
+iptables-save > /root/iptables-backup-$(date +%F-%H%M).rules
 
-echo "[3/6] Buat konfigurasi Fail2ban (L4 & L7)..."
-cat > /etc/fail2ban/jail.local <<'EOL'
+echo "[3/9] Buat konfigurasi Fail2ban..."
+cat > /etc/fail2ban/jail.local <<EOL
 [DEFAULT]
 bantime = 3600
 findtime = 600
@@ -75,27 +75,81 @@ findtime = 86400
 maxretry = 5
 EOL
 
-echo "[4/6] Buat filter HTTP Flood..."
+echo "[4/9] Buat filter HTTP Flood..."
 cat > /etc/fail2ban/filter.d/nginx-http-flood.conf <<'EOL'
 [Definition]
 failregex = ^<HOST> -.*"(GET|POST).*HTTP.*" 200
 ignoreregex =
 EOL
 
-echo "[5/6] Tambah Rate Limiting di NGINX..."
-# Tambah rate limiting di nginx.conf jika belum ada
+echo "[5/9] Tambah Rate Limiting di NGINX..."
 if ! grep -q "limit_req_zone" /etc/nginx/nginx.conf; then
 sed -i '/http {/a \    limit_req_zone $binary_remote_addr zone=req_limit_per_ip:10m rate=10r/s;\n    limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip:10m;' /etc/nginx/nginx.conf
 fi
 
-echo "[6/6] Restarting services..."
+echo "[6/9] Konfigurasi iptables Anti-DDoS L4..."
+iptables -F
+iptables -X
+
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --set
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 5 -j DROP
+
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+iptables -A INPUT -p udp -m limit --limit 5/second -j ACCEPT
+iptables -A INPUT -p udp -j DROP
+
+iptables -A INPUT -j DROP
+
+iptables-save > /etc/iptables/rules.v4
+netfilter-persistent save
+
+echo "[7/9] Aktifkan Notifikasi Telegram untuk Fail2ban..."
+cat > /etc/fail2ban/action.d/telegram-notify.conf <<EOL
+[Definition]
+actionstart = curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text="🚨 Fail2ban dimulai di \`$(hostname)\`"
+actionban = curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text="🚨 IP Diblokir: <ip> oleh <name> (jail fail2ban)"
+actionunban = curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text="✅ IP Dibuka: <ip> oleh <name>"
+EOL
+
+# Update action di jail.local
+sed -i 's/action = .*/action = %(action_)s\n        telegram-notify/g' /etc/fail2ban/jail.local
+
+echo "[8/9] Buat cron untuk cek iptables banned UDP/TCP dan kirim Telegram..."
+cat > /usr/local/bin/iptables-notify.sh <<EOL
+#!/bin/bash
+IPLIST=\$(iptables -L INPUT -n | grep "DROP" | awk '{print \$4}')
+for ip in \$IPLIST; do
+  curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text="🚨 iptables Drop: \$ip (mungkin UDP/TCP flood)"
+done
+EOL
+chmod +x /usr/local/bin/iptables-notify.sh
+
+# Tambah ke cron tiap 10 menit
+(crontab -l 2>/dev/null; echo "*/10 * * * * /usr/local/bin/iptables-notify.sh") | crontab -
+
+echo "[9/9] Restarting services..."
 systemctl restart fail2ban
 nginx -t && systemctl reload nginx
 
 echo "==========================================="
-echo "✅ Anti-DDoS L4 + L7 berhasil diinstal!"
-echo "Cek status jail: sudo fail2ban-client status"
+echo "✅ FULL Anti-DDoS L4 + L7 + Telegram Notif aktif!"
+echo "IP diblokir akan dikirim ke Telegram ✅"
 echo "==========================================="
+```
+# SCRIPT AUTO INSTALLER VPN
+```
+wget --no-check-certificate https://raw.githubusercontent.com/victor3232/vip/main/premi.sh && chmod +x premi.sh && ./premi.sh
+```
+```
+# JAIL.CONF
+```
+```
+
 ```
 ```
 chmod +x namafile.sh
