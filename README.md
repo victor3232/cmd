@@ -131,58 +131,6 @@ fail2ban-client -d
 systemctl status fail2ban
 ```
 ```
-systemctl start fail2ban
-```
-```
-nano /etc/fail2ban/jail.local
-```
-```
-[DEFAULT]
-# Umum
-bantime = 3600
-findtime = 600
-maxretry = 5
-backend = auto
-destemail = root@localhost
-action = %(action_)s
-
-# Blok permanen kalau mau (opsional)
-# bantime = -1
-
-# Ban log: di /var/log/fail2ban.log
-logtarget = /var/log/fail2ban.log
-
-# SSH protection
-[sshd]
-enabled = true
-port = ssh
-filter = sshd
-logpath = /var/log/auth.log
-maxretry = 5
-bantime = 3600
-findtime = 600
-
-# NGINX 403/404 brute force protection (misal Pterodactyl panel)
-[nginx-http-auth]
-enabled = true
-filter = nginx-http-auth
-port = http,https
-logpath = /var/log/nginx/*access*.log
-maxretry = 10
-bantime = 3600
-findtime = 600
-
-# NGINX 404 protection (hindari scan bot massal)
-[nginx-botsearch]
-enabled = true
-filter = nginx-botsearch
-port = http,https
-logpath = /var/log/nginx/*access*.log
-maxretry = 10
-bantime = 3600
-findtime = 600
-```
-```
 systemctl restart fail2ban
 ```
 ```
