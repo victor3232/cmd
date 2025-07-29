@@ -153,6 +153,9 @@ sudo bash namafile.sh
 fail2ban-client -d
 ```
 ```
+sudo fail2ban-client status
+```
+```
 systemctl status fail2ban
 ```
 ```
