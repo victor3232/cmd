@@ -136,6 +136,18 @@ echo "Cek jail:     fail2ban-client status"
 echo "Cek iptables: iptables -L -n"
 echo "==========================================="
 ```
+# CF PTERODACTYL 
+```
+(not http.host in {"cjdw.tech" "www.cjdw.tech"}) or
+(ip.src.country in {"T1"}) or
+(http.request.version eq "HTTP/1.0") or
+(http.user_agent eq "") or
+(cf.threat_score gt 5)
+```
+# RATE LIMIT
+```
+(not cf.bot_management.verified_bot)
+```
 # FIX JAIL
 ```
 #!/bin/bash
