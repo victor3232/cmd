@@ -144,6 +144,16 @@ echo "==========================================="
 (http.user_agent eq "") or
 (cf.threat_score gt 5)
 ```
+# CLOUDFLARE ZERO NAT
+```
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+```
+```
+sudo dpkg -i cloudflared-linux-amd64.deb
+```
+```
+cloudflared --version
+```
 # RATE LIMIT
 ```
 (not cf.bot_management.verified_bot)
