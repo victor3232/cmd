@@ -144,6 +144,44 @@ echo "==========================================="
 (http.user_agent eq "") or
 (cf.threat_score gt 5)
 ```
+# FIX DB MYSQL SIZE
+```
+mysql -u root -p
+```
+```
+USE panel;
+
+SELECT table_name AS "Nama Tabel", 
+       ROUND((data_length + index_length) / 1024 / 1024, 2) AS "Size (MB)" 
+FROM information_schema.TABLES 
+WHERE table_schema = "panel" 
+ORDER BY (data_length + index_length) DESC;
+```
+```
+-- Mengosongkan log aktivitas panel
+TRUNCATE TABLE activity_logs;
+
+-- Mengosongkan antrean job Laravel
+TRUNCATE TABLE jobs;
+TRUNCATE TABLE failed_jobs;
+```
+```
+-- Nonaktifkan pengecekan foreign key sementara
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Kosongkan tabel log aktivitas dan relasinya
+TRUNCATE TABLE activity_log_subjects;
+TRUNCATE TABLE activity_logs;
+
+-- Aktifkan kembali pengecekan foreign key
+SET FOREIGN_KEY_CHECKS = 1;
+```
+```
+OPTIMIZE TABLE activity_logs, activity_log_subjects;
+```
+```
+EXIT;
+```
 # CLOUDFLARE ZERO NAT
 ```
 wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
